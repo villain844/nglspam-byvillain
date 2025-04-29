@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Villain Host - NGL Spammer</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      text-align: center;
+      padding: 30px;
+    }
+    input, textarea, button {
+      margin: 10px;
+      padding: 10px;
+      width: 80%;
+      font-size: 16px;
+      border: 2px solid #0f0;
+      background-color: #000;
+      color: #0f0;
+      border-radius: 5px;
+      box-shadow: 0 0 8px #0f0;
+    }
+    button {
+      background-color: #0f0;
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+    }
+    .glitch {
+      font-size: 30px;
+      font-weight: bold;
+      animation: glitch 1s infinite;
+    }
+    @keyframes glitch {
+      0% { text-shadow: 1px 0 red; }
+      25% { text-shadow: -1px 0 blue; }
+      50% { text-shadow: 1px 0 green; }
+      75% { text-shadow: -1px 0 purple; }
+      100% { text-shadow: 0 0 white; }
+    }
+    #logBox {
+      background-color: #111;
+      color: #0f0;
+      margin-top: 20px;
+      padding: 15px;
+      width: 90%;
+      max-height: 300px;
+      overflow-y: auto;
+      text-align: left;
+      border: 2px solid #0f0;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #0f0;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .done {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>SELAMAT DATANG DI</h1>
+  <div class="glitch">𓆩⟬villain host⟭𓆪</div>
+  <h2>NGL Spammer Anonim</h2>
+
+  <input type="text" id="username" placeholder="Username NGL (tanpa @)">
+  <textarea id="message" rows="4" placeholder="Tulis pesan anonim..."></textarea>
+  <input type="number" id="jumlah" placeholder="Jumlah kirim? (1–20)" min="1" max="20">
+  <input type="number" id="delay" placeholder="Delay antar pesan (1–60 detik)" min="1" max="60">
+  <br>
+  <button onclick="kirimPesan()">Mulai Kirim</button>
+  <p id="status"></p>
+
+  <div id="logBox"></div>
+
+  <script>
+    async function kirimPesan() {
+      const username = document.getElementById('username').value.trim();
+      const pesan = document.getElementById('message').value.trim();
+      const jumlah = parseInt(document.getElementById('jumlah').value);
+      const delayDetik = parseInt(document.getElementById('delay').value);
+      const status = document.getElementById('status');
+      const logBox = document.getElementById('logBox');
+
+      if (!username || !pesan || isNaN(jumlah) || jumlah < 1 || jumlah > 20 || isNaN(delayDetik) || delayDetik < 1 || delayDetik > 60) {
+        status.textContent = "Harap isi semua kolom dengan benar!";
+        return;
+      }
+
+      const delay = delayDetik * 1000; // ubah ke milidetik
+
+      status.textContent = "Mengirim pesan...";
+      logBox.innerHTML = "";
+
+      for (let i = 1; i <= jumlah; i++) {
+        try {
+          await fetch('/api/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, message: pesan })
+          });
+
+          const logLine = document.createElement('div');
+          logLine.textContent = `pesan ke ${i} berhasil terkirim by villain`;
+          logBox.appendChild(logLine);
+          logBox.scrollTop = logBox.scrollHeight;
+
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } catch (err) {
+          status.textContent = `Gagal mengirim pesan ke @${username}`;
+          return;
+        }
+      }
+
+      const doneLine = document.createElement('div');
+      doneLine.innerHTML = `<span class="done">done yang ke ${jumlah} sudah berhasil terkirim ya 😋</span>`;
+      logBox.appendChild(doneLine);
+      logBox.scrollTop = logBox.scrollHeight;
+      status.textContent = "Selesai!";
+    }
+  </script>
+</body>
+</html>
